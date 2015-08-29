@@ -5,3 +5,4 @@
 *.rst
 *.json
 setup*
+__init__.py
