@@ -1,8 +1,12 @@
+# -*- coding: utf-8 -*-
 import os
 import json
 import requests
 import time
 import re
+import codecs
+from kitchen.text.converters import getwriter
+import sys
 
 def getConfig():
     curPath = os.getcwd()
@@ -92,14 +96,63 @@ def unfurlJson(someJson):
 def jsonToCsv(fileName, separator):
     theStr = ''
     with open('%s/%s.json' % (os.getcwd(), fileName), 'rb') as f:
-        theJson = json.dumps(f.read())
+        theJson = json.loads(f.read())
     f.close()
-    theStr = re.sub(r"[(\{\S+)(\S+\}\S+)]", separator, theJson)
+
+    methodList =[ 
+        {'about_me': 'string'}, 
+        {'accept_rate': 'integer'}, 
+        {'account_id': 'integer'},
+        {'age': 'integer'}, 
+        {'answer_count': 'integer'},
+        {'badge_counts': 'badge_count'},
+        {'creation_date': 'date'},
+        {'display_name': 'string'},
+        {'down_vote_count': 'integer'},
+        {'is_employee': 'boolean'},
+        {'last_access_date': 'date'},
+        {'last_modified_date': 'date'}, 
+        {'link': 'string'}, 
+        {'location': 'string'}, 
+        {'profile_image': 'string'}, 
+        {'question_count': 'integer'},
+        {'reputation': 'integer'},
+        {'reputation_change_day': 'integer'},
+        {'reputation_change_month': 'integer'},
+        {'reputation_change_quarter': 'integer'},
+        {'reputation_change_week': 'integer'},
+        {'reputation_change_year': 'integer'},
+        {'timed_penalty_date': 'date'}, 
+        {'up_vote_count': 'integer'},
+        {'user_id': 'integer'},
+        {'user_type': 'string'},
+        {'view_count': 'integer'},
+        {'website_url': 'string'}
+    ] 
+
+    for user in theJson:
+        for method in methodList:
+            for key in method:
+                try:
+                    theStr += user[str(key)]
+                except TypeError:
+                    theStr += str(user[str(key)])
+                except KeyError:
+                    theStr += 'No ' + str(key)
+                except UnicodeError:
+                    theStr += 'Unicode Error'
+            theStr += separator
+        theStr += '\n'
+    UTF8Writer = getwriter('utf8')
+
     with open('%s/%s.csv' % (os.getcwd(), fileName), 'wb') as f:
+        f = UTF8Writer(f)
         f.write(theStr)
     f.close()
 
 if __name__ == "__main__":
+    jsonToCsv('stackUsers', '^')
+    '''
     users = {
         'has_more': True,
         'quota_remaining': 1,
@@ -109,4 +162,4 @@ if __name__ == "__main__":
         "page": 27000
     }
     recursiveFunc(users, options)
-        
+    '''
