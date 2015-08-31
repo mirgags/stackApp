@@ -129,7 +129,10 @@ def jsonToCsv(fileName, separator):
         {'view_count': 'integer'},
         {'website_url': 'string'}
     ] 
-
+    for method in methodList:
+        for key in method:
+            theStr += str(key) + separator
+    theStr += '\n'
     for user in theJson:
         for method in methodList:
             for key in method:
